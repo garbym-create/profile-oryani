@@ -347,15 +347,12 @@ function renderIn(){
    '</div></div>');
 
 
-  h+='<div class="card"><h2>הצירים</h2><p class="sub">מקור: הפיקוח על הוראת העברית ביסודי — המזכירות הפדגוגית, אגף שפות.</p>';
-  AXES.forEach((ax,i)=>{
-    h+='<div class="q"><p>'+(i+1)+'. '+esc(ax.t)+'</p><div class="tri" style="flex-direction:column">'+
+  h+=acc('הצירים','מקור: הפיקוח על הוראת העברית ביסודי — המזכירות הפדגוגית, אגף שפות',false,
+    AXES.map((ax,i)=>'<div class="q"><p>'+(i+1)+'. '+esc(ax.t)+'</p><div class="tri" style="flex-direction:column">'+
       ax.o.map((o,j)=>'<button type="button" style="text-align:right" aria-pressed="false" data-k="'+ax.k+'" data-v="'+j+'" onclick="pick(this)">'+esc(o[gi()])+'</button>').join('')+
-      '</div></div>';
-  });
-  h+='</div>';
+      '</div></div>').join(''));
 
-  h+=acc('מאפיינים נוספים','',true,
+  h+=acc('מאפיינים נוספים','',false,
     YN.map(y=>'<div class="q"><p>'+esc(y.t[gi()])+'</p><div class="tri">'+
       ["כן","לא"].map(o=>'<button type="button" aria-pressed="false" data-k="'+y.k+'" data-v="'+o+'" onclick="pick(this)">'+o+'</button>').join('')+
       '</div></div>').join(''));
