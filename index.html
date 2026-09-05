@@ -138,7 +138,7 @@
   .prof{border:1.5px solid var(--line);border-radius:var(--r);margin-bottom:12px;
     overflow:hidden;box-shadow:var(--shadow)}
   .prof .top{padding:14px 18px}
-  .prof .top b{font-size:1.02rem;font-weight:800} .prof .top span{color:#4a5a6a;font-size:.88rem}
+  .prof .top b{font-size:1.02rem;font-weight:800} .prof .top span{color:var(--navy);font-size:1.02rem}
   .prof.sel{border-color:var(--deep);box-shadow:0 0 0 3px rgba(44,110,143,.16),0 4px 16px rgba(36,59,83,.1)}
   .prof .body{background:#fff;border-radius:14px;margin:0 12px 12px;padding:12px 16px 14px;font-size:.9rem}
   .cnt{font-size:.85rem;color:var(--grey);margin-top:10px;font-weight:600}
@@ -164,7 +164,7 @@
   <div class="steps no-print">
     <div class="step on" id="s1" onclick="go(1)">1 · מאפיינים</div>
     <div class="step" id="s2" onclick="go(2)">2 · בחירת פרופיל</div>
-    <div class="step" id="s3" onclick="go(3)">3 · מיקוד ההוראה</div>
+    <div class="step" id="s3" onclick="go(3)">3 · הצעות למיקוד ההוראה</div>
   </div>
   <div class="prog no-print" id="prog" hidden>
     <div class="lbl"><span>התקדמות הסימון</span><b id="progtxt">0 מתוך 9</b></div>
@@ -337,7 +337,7 @@ function renderIn(){
    '<p class="sub">חמישה צירים וחמישה מאפיינים נוספים, כלשונם במסמך "הפרופיל האורייני לתלמידים בכיתות ב\'–ו\'". בכל ציר יש לבחור אפשרות אחת — האפשרויות מוציאות זו את זו.</p>'+
    '<div class="note">הכלי אינו מחשב פרופיל ואינו מדרג. הוא מציג אילו מן האמירות הרשמיות בחרתם, ומול איזה פרופיל הן עומדות. ההחלטה שלכם.</div></div>';
 
-  h+=acc('פרטי ההעברה','שם הטקסט ורמת הכתב · תיעוד בלבד, אינו נכלל בהשוואה',false,
+  h+=acc('פרטי ההעברה','',false,
    '<div class="fld"><label>לשון הפנייה</label><div class="opts">'+
    ["תלמיד","תלמידה"].map(o=>'<button type="button" aria-pressed="'+(V.gender===o?'true':'false')+'" data-k="gender" data-v="'+o+'" onclick="setGender(this)">'+o+'</button>').join('')+
    '</div></div>'+
@@ -368,10 +368,9 @@ function renderIn(){
    '<div class="q"><p>כיול — ההערכה העצמית מול ההישגים</p><div class="opts">'+
     ["מתאם גבוה","מתאם נמוך"].map(o=>'<button type="button" aria-pressed="false" data-k="kiyul" data-v="'+o+'" onclick="pick(this)">'+o+'</button>').join('')+
     '</div></div>';
-  h+=acc('שאלונים רפלקטיביים','אופציונלי · מזין את ההמלצות להתערבות בשלב 3',false,
-    '<p class="sub">סימון ההיגדים שהתלמיד בחר, לפי המדריך למורה של השאלונים. אינו נכלל בהשוואה מול הפרופילים — המקור אינו מקשר בין השאלונים לפרופיל.</p>'+qh);
+  h+=acc('שאלונים רפלקטיביים','',false,qh);
 
-  h+=acc('המסמכים הרשמיים',SRC.length+' מסמכים · נפתחים בלשונית חדשה',false,
+  h+=acc('המסמכים הרשמיים','המסמכים עליהם התבססנו',false,
     '<ul style="margin:0;padding-right:20px">'+
     SRC.map(x=>'<li style="margin-bottom:7px"><a href="'+x[1]+'" target="_blank" rel="noopener">'+esc(x[0])+'</a></li>').join('')+
     '</ul>');
@@ -417,7 +416,6 @@ function ynText(k){ const y=YN.find(x=>x.k===k); return y?y.t[gi()]:''; }
 
 function renderCmp(){
   let h='<div class="card"><h2>השוואה מול חמשת הפרופילים</h2>'+
-   '<p class="sub">לכל פרופיל מוצגים המאפיינים שלו כלשונם, ולצדם הבחירה שלכם.</p>'+
    '<div class="note">✓ הבחירה שלכם זהה למאפיין &nbsp;·&nbsp; ✗ בחרתם אפשרות אחרת באותו ציר &nbsp;·&nbsp; — לא נבחר</div></div>';
   PROFS.forEach(p=>{
     let yes=0, tot=0, rows='';
@@ -474,9 +472,8 @@ function renderOut(){
         '<div class="accbody"><p style="margin:0">'+esc(f.learn)+'</p></div></details>').join('');
   }
   let h='<div class="card out">'+
-   '<h2>הפרופיל שנבחר</h2>'+
-   '<p><span class="badge" style="background:'+p.fill+'">פרופיל '+p.n+' — '+esc(p.name)+'</span></p>'+
-   '<p class="sub" style="margin-top:10px"><b>מוקד ההוראה:</b> '+esc(p.prfocus)+'</p>'+
+   '<h2>הפרופיל הנבחר: '+esc(p.name)+'</h2>'+
+   '<p style="margin:12px 0 4px"><span class="badge" style="background:'+p.fill+'">מיקוד ההוראה: '+esc(p.prfocus)+'</span></p>'+
    (det?'<p class="sub"><b>פרטי ההעברה:</b> '+esc(det)+'</p>':'')+
    '<h3>המאפיינים שסומנו</h3>'+marked+
    '<h3>מטרות הוראה</h3><ul>'+p.goals.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>'+
@@ -487,7 +484,7 @@ function renderOut(){
    (p.special?'<div class="warn">'+esc(p.special)+'</div>':'')+
    refl+
    '<h3>מדדי תוצאה — מה ייחשב להצלחה</h3><ul>'+p.meas.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>'+
-   '<div class="warn">המטרות האופרטיביות נכתבות בתל"א; הפרופיל מזין אותן ואינו בא במקומן. לפני בניית קבוצות הוראה יש לאסוף ראיות נוספות ולא להסתמך על משימת הערכה אחת בלבד.</div>'+
+   '<div class="warn">המטרות האופרטיביות נכתבות בתל"א / תח"י; הפרופיל מזין אותן ואינו בא במקומן. לפני בניית קבוצות הוראה יש לאסוף ראיות נוספות ולא להסתמך על משימת הערכה אחת בלבד.</div>'+
    '</div>'+
    '<div class="nav no-print"><button class="ghost" onclick="go(2)">חזרה לבחירה</button>'+
    '<button class="primary" onclick="window.print()">הדפסה</button></div>';
