@@ -327,6 +327,30 @@ const QSTR=[
 /* תוויות מקצרות לתצוגה החזותית בלבד. הניסוח הרשמי המלא מוצג בפתיחת הפרופיל. */
 const SHORT={read:"קריאה",havana:"הבנת הנקרא",siach:"שיח אורייני",safa:"שפה והבעה",ktiva:"כתיבה",
  mukra:"הבנת הנשמע",otzar:"אוצר מילים וידע לשוני",hana:"הנאה מקריאה ומכתיבה",bitachon:"ביטחון אורייני",atzmai:"שימוש עצמאי"};
+
+/* ששת ההיבטים של השאלונים. ההגדרות של שלושת הראשונים כלשונן במדריך למורה;
+   של שלושת האחרונים מורכבות מן הניתוח שהמדריך נותן להיגדים שתחתיהם. */
+const DIMS=[
+ {k:"d1",part:"רגש וקריאה",name:"חוויה רגשית",pre:"חוויה רגשית",
+  desc:"מנעד הרגשות שחווים התלמידים סביב ההתנסויות בקריאה. באיזו מידה הם חווים רגשות של הנאה, עונג ועניין במהלך ביצוע מטלות קריאה, ובאיזו מידה הם חווים רגשות של תסכול, שעמום וחוסר אונים."},
+ {k:"d2",part:"רגש וקריאה",name:"תפיסות ועמדות",pre:"תפיסות ועמדות",
+  desc:"מהן העמדות והתפיסות שהתגבשו אצל התלמיד בנוגע לקריאה בכלל ובנוגע לעצמו כקורא. תפיסות ועמדות משקפות הערכה עצמית, תחושת מסוגלות והכרה בערך ובחשיבות של הקריאה."},
+ {k:"d3",part:"רגש וקריאה",name:"היבט התנהגותי",pre:"היבט התנהגותי",
+  desc:"מגוון התנהגויות המושקעות בקידום הקריאה. חלק זה נוגע להיבטים מוטיבציוניים והנעה לקריאה. מוטיבציה משתקפת לא רק בכוונות ובגישה, אלא גם בהשקעת זמן בקריאה. השקעת זמן בתרגול ובאימון קריאה ובקריאה להנאה משקפים לא רק מוטיבציה, אלא גם מחויבות."},
+ {k:"d4",part:"אסטרטגיות קריאה",name:"קריאה מנוטרת הבנה",pre:"קריאה מנוטרת הבנה",
+  desc:"הפניית קשב לתוכן והפעלת בקרה במהלך הקריאה, ועל הלמידה בעקבותיה."},
+ {k:"d5",part:"אסטרטגיות קריאה",name:"ויסות וניהול אופן הקריאה",pre:"ויסות וניהול אופן הקריאה",
+  desc:"ביטחון בקריאה וניהול יעיל שלה: קריאה חוזרת של משפטים שלא הובנו, וחזרה לטקסט לחיפוש מידע. אסטרטגיה של חזרה לטקסט יעילה מאוד ויש לעודד אותה."},
+ {k:"d6",part:"אסטרטגיות קריאה",name:"הפעלת אסטרטגיות לפתרון בעיות",pre:"הפעלת אסטרטגיות לפתרון בעיות",
+  desc:"דרכי ההתמודדות עם מילים ומשפטים שאינם מובנים. קריאה יעילה ואסטרטגית באה לידי ביטוי בתהליכי קריאה המנוהלים באופן גמיש ומושכל ובאופן שבו הקורא מתמודד עם אתגרי הקריאה."}
+];
+function dimRecs(d){
+  const out=[];
+  QEMO.concat(QSTR).filter(f=>f.d.indexOf(d.pre)===0)
+    .forEach(f=>f.recs.forEach(r=>{ if(!out.includes(r)) out.push(r); }));
+  return out;
+}
+
 const V={}; let chosen=null; let openProf=null;
 /* 0 = לשון רבים כבמקור · 1 = תלמיד · 2 = תלמידה */
 function gi(){ return V.gender==="תלמיד"?1:V.gender==="תלמידה"?2:0; }
@@ -357,18 +381,21 @@ function renderIn(){
       ["כן","לא"].map(o=>'<button type="button" aria-pressed="false" data-k="'+y.k+'" data-v="'+o+'" onclick="pick(this)">'+o+'</button>').join('')+
       '</div></div>').join(''));
 
-  const items=(list,title)=>{
-    let o='<div class="fld"><label>'+title+'</label>';
-    list.forEach((f,i)=>{ o+='<div class="q"><p>'+(i+1)+'. '+esc(f.t)+'</p><div class="tri">'+
-      ["סימן","לא סימן"].map(v=>'<button type="button" aria-pressed="false" data-k="'+f.k+'" data-v="'+v+'" onclick="pick(this)">'+v+'</button>').join('')+
-      '</div></div>'; });
-    return o+'</div>';
-  };
-  let qh=items(QEMO,'שאלון רגש וקריאה')+items(QSTR,'שאלון אסטרטגיות קריאה')+
-   '<div class="q"><p>כיול — ההערכה העצמית מול ההישגים</p><div class="opts">'+
+  let qh='';
+  ["רגש וקריאה","אסטרטגיות קריאה"].forEach(part=>{
+    qh+='<div class="fld"><label>'+part+'</label>';
+    DIMS.filter(d=>d.part===part).forEach(d=>{
+      qh+='<div class="q"><p>'+esc(d.name)+'</p>'+
+        '<p class="sub" style="margin:0 0 9px">'+esc(d.desc)+'</p><div class="tri">'+
+        ["חוזק","לחיזוק"].map(v=>'<button type="button" aria-pressed="false" data-k="'+d.k+'" data-v="'+v+'" onclick="pick(this)">'+v+'</button>').join('')+
+        '</div></div>';
+    });
+    qh+='</div>';
+  });
+  qh+='<div class="q"><p>כיול — ההערכה העצמית מול ההישגים</p><div class="opts">'+
     ["מתאם גבוה","מתאם נמוך"].map(o=>'<button type="button" aria-pressed="false" data-k="kiyul" data-v="'+o+'" onclick="pick(this)">'+o+'</button>').join('')+
     '</div></div>';
-  h+=acc('שאלונים רפלקטיביים','',false,qh);
+  h+=acc('רגש וקריאה ואסטרטגיות','',false,qh);
 
   h+=acc('המסמכים הרשמיים','המסמכים עליהם התבססנו',false,
     '<ul style="margin:0;padding-right:20px">'+
@@ -449,27 +476,28 @@ function renderOut(){
   const prof=[];
   AXES.forEach(ax=>{ const g=V[ax.k]; if(g!==undefined) prof.push('<li><b>'+esc(ax.t)+':</b> '+esc(axText(ax.k,Number(g)))+'</li>'); });
   YN.forEach(y=>{ if(V[y.k]==="כן") prof.push('<li>'+esc(ynText(y.k))+'</li>'); });
-  const grp=(list,title)=>{
-    const it=list.filter(f=>V[f.k]!==undefined)
-      .map(f=>'<li>'+(V[f.k]==="סימן"?'<span class="ok">✓</span>':'<span class="no">✗</span>')+' '+esc(f.t)+'</li>');
-    return it.length?'<p class="cat">'+title+'</p><ul>'+it.join('')+'</ul>':'';
+  const grp=(part)=>{
+    const it=DIMS.filter(d=>d.part===part&&V[d.k]!==undefined)
+      .map(d=>'<li>'+(V[d.k]==="חוזק"?'<span class="ok">✓</span>':'<span class="no">▲</span>')+' '+esc(d.name)+' — '+esc(V[d.k])+'</li>');
+    return it.length?'<p class="cat">'+part+'</p><ul>'+it.join('')+'</ul>':'';
   };
   const marked='<p class="cat">הפרופיל האורייני</p><ul>'+(prof.join('')||'<li>לא סומנו מאפיינים.</li>')+'</ul>'+
-    grp(QEMO,'רגש וקריאה')+grp(QSTR,'אסטרטגיות קריאה')+
+    grp('רגש וקריאה')+grp('אסטרטגיות קריאה')+
     (V.kiyul?'<p class="cat">כיול</p><ul><li>'+esc(V.kiyul)+'</li></ul>':'');
   const tn=(document.getElementById('txtname')||{}).value||'';
   const det=[V.ktav,tn].filter(Boolean).join(' · ');
-  const answered=QEMO.concat(QSTR).filter(f=>V[f.k]!==undefined);
+  const weak=DIMS.filter(d=>V[d.k]==="לחיזוק");
   const extra=[];
-  answered.forEach(f=>f.recs.forEach(r=>{ if(!p.ped.includes(r)&&!extra.includes(r)) extra.push(r); }));
+  weak.forEach(d=>dimRecs(d).forEach(r=>{ if(!p.ped.includes(r)&&!extra.includes(r)) extra.push(r); }));
   const ped=p.ped.concat(extra);
+  const shown=DIMS.filter(d=>V[d.k]!==undefined);
   let refl='';
-  if(answered.length){
-    refl='<h3>ההיגדים שסומנו בשאלונים</h3>'+
-      answered.map(f=>'<details class="acc" style="margin-bottom:8px"><summary>'+
-        '<span><span class="t" style="font-size:.94rem">'+(V[f.k]==="סימן"?'✓':'✗')+' '+esc(f.t)+'</span>'+
-        '<span class="s">'+esc(f.d)+' · '+esc(V[f.k])+'</span></span><span class="chev">+</span></summary>'+
-        '<div class="accbody"><p style="margin:0">'+esc(f.learn)+'</p></div></details>').join('');
+  if(shown.length){
+    refl='<h3>ההיבטים שסומנו</h3>'+
+      shown.map(d=>'<details class="acc" style="margin-bottom:8px"><summary>'+
+        '<span><span class="t" style="font-size:.94rem">'+(V[d.k]==="חוזק"?'✓':'▲')+' '+esc(d.name)+'</span>'+
+        '<span class="s">'+esc(d.part)+' · '+esc(V[d.k])+'</span></span><span class="chev">+</span></summary>'+
+        '<div class="accbody"><p style="margin:0">'+esc(d.desc)+'</p></div></details>').join('');
   }
   let h='<div class="card out">'+
    '<h2>הפרופיל הנבחר: '+esc(p.name)+'</h2>'+
