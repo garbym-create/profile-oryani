@@ -469,7 +469,7 @@ function renderCmp(){
   document.getElementById('v2').innerHTML=h;
 }
 function toggleProf(n){ openProf=(openProf===n?null:n); renderCmp(); }
-function choose(n){ chosen=n; renderCmp(); }
+function choose(n){ chosen=n; go(3); }
 
 function renderOut(){
   const p=PROFS.find(x=>x.n===chosen);
