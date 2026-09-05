@@ -24,6 +24,16 @@
     border-radius:22px;padding:26px 26px 24px;margin-bottom:16px;box-shadow:0 6px 22px rgba(36,59,83,.16)}
   header h1{margin:0 0 6px;font-size:1.5rem;font-weight:800;letter-spacing:-.2px}
   header p{margin:0;color:#d3e6ef;font-size:.92rem}
+  header{position:relative}
+  .info{position:absolute;top:20px;left:20px;width:36px;height:36px;border-radius:50%;
+    border:1.5px solid rgba(255,255,255,.5);background:rgba(255,255,255,.12);color:#fff;
+    font:inherit;font-size:1.05rem;font-weight:800;cursor:pointer;line-height:1;
+    display:flex;align-items:center;justify-content:center;transition:all .15s ease}
+  .info:hover{background:rgba(255,255,255,.24);border-color:#fff}
+  .info[aria-expanded="true"]{background:#fff;color:var(--deep);border-color:#fff}
+  #srcbox ul{margin:0;padding-right:20px}
+  #srcbox li{margin-bottom:8px}
+  @media (max-width:520px){ .info{top:14px;left:14px;width:32px;height:32px;font-size:.95rem} }
   .steps{display:flex;gap:10px;margin:16px 0 20px}
   .step{flex:1;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 8px;
     text-align:center;font-size:.86rem;font-weight:600;color:var(--grey);cursor:pointer;
@@ -158,9 +168,15 @@
 <body>
 <div class="wrap">
   <header>
+    <button class="info no-print" id="infobtn" aria-expanded="false"
+      aria-label="המסמכים עליהם התבססנו" title="המסמכים עליהם התבססנו" onclick="toggleSrc()">i</button>
     <h1>הפרופיל האורייני — כלי תמיכה בהחלטה</h1>
     <p>סימון המאפיינים הרשמיים · השוואה מול חמשת הפרופילים · פרקטיקות, מטרות ומדדי תוצאה</p>
   </header>
+  <div class="card no-print" id="srcbox" hidden>
+    <h2>המסמכים עליהם התבססנו</h2>
+    <ul id="srclist"></ul>
+  </div>
   <div class="steps no-print">
     <div class="step on" id="s1" onclick="go(1)">1 · מאפיינים</div>
     <div class="step" id="s2" onclick="go(2)">2 · בחירת פרופיל</div>
@@ -397,11 +413,6 @@ function renderIn(){
     '</div></div>';
   h+=acc('רגש וקריאה ואסטרטגיות','',false,qh);
 
-  h+=acc('המסמכים הרשמיים','המסמכים עליהם התבססנו',false,
-    '<ul style="margin:0;padding-right:20px">'+
-    SRC.map(x=>'<li style="margin-bottom:7px"><a href="'+x[1]+'" target="_blank" rel="noopener">'+esc(x[0])+'</a></li>').join('')+
-    '</ul>');
-
   h+='<div class="nav no-print"><button class="primary" onclick="go(2)">להשוואה מול הפרופילים</button></div>';
   document.getElementById('v1').innerHTML=h;
   updProg();
@@ -527,6 +538,13 @@ function go(n){
     document.getElementById('s'+i).className='step'+(i===n?' on':(i<n?' done':'')); });
   window.scrollTo({top:0,behavior:'smooth'});
 }
+function toggleSrc(){
+  const b=document.getElementById('srcbox'), t=document.getElementById('infobtn');
+  b.hidden=!b.hidden; t.setAttribute('aria-expanded', b.hidden?'false':'true');
+  if(!b.hidden) b.scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+document.getElementById('srclist').innerHTML=
+  SRC.map(x=>'<li><a href="'+x[1]+'" target="_blank" rel="noopener">'+esc(x[0])+'</a></li>').join('');
 renderIn();
 document.getElementById('prog').hidden=false;
 </script>
