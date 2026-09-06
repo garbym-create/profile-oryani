@@ -98,6 +98,8 @@
   .mark{flex:0 0 24px;text-align:center;font-weight:800}
   .ok{color:var(--green)} .no{color:var(--coral)} .na{color:#b6c3cd}
   .cnt{font-size:.85rem;color:var(--grey);margin-top:10px;font-weight:600}
+  .note .lg{display:flex;gap:8px;align-items:baseline;padding:3px 0}
+  .note .lg .mark{flex:0 0 20px;text-align:center}
   .pick{width:100%;min-height:50px;border-radius:12px;border:1.5px solid var(--deep);background:#fff;
     color:var(--deep);font:inherit;font-weight:800;cursor:pointer;margin-top:12px;transition:all .16s ease}
   .pick:hover{background:var(--ice)}
@@ -132,8 +134,9 @@
   details.acc .accbody .q:first-of-type{border-top:0}
 
   /* --- גרף התקדמות --- */
-  .prog{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 18px;
-    margin-bottom:18px;box-shadow:var(--shadow)}
+  .prog{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 18px;
+    margin-bottom:18px;box-shadow:var(--shadow);position:sticky;top:8px;z-index:20}
+  .prog::before{content:"";position:absolute;inset:-10px -14px 0;background:var(--bg);z-index:-1}
   .prog .lbl{display:flex;justify-content:space-between;align-items:baseline;
     font-size:.86rem;color:var(--grey);margin-bottom:9px}
   .prog .lbl b{color:var(--deep);font-weight:800;font-size:.94rem}
@@ -387,7 +390,7 @@ function renderIn(){
    '</div></div>');
 
 
-  h+=acc('הצירים','מקור: הפיקוח על הוראת העברית ביסודי — המזכירות הפדגוגית, אגף שפות',false,
+  h+=acc('הצירים','',false,
     AXES.map((ax,i)=>'<div class="q"><p>'+(i+1)+'. '+esc(ax.t)+'</p><div class="tri" style="flex-direction:column">'+
       ax.o.map((o,j)=>'<button type="button" style="text-align:right" aria-pressed="false" data-k="'+ax.k+'" data-v="'+j+'" onclick="pick(this)">'+esc(o[gi()])+'</button>').join('')+
       '</div></div>').join(''));
@@ -454,7 +457,9 @@ function ynText(k){ const y=YN.find(x=>x.k===k); return y?y.t[gi()]:''; }
 
 function renderCmp(){
   let h='<div class="card"><h2>השוואה מול חמשת הפרופילים</h2>'+
-   '<div class="note">✓ הבחירה שלכם זהה למאפיין &nbsp;·&nbsp; ✗ בחרתם אפשרות אחרת באותו ציר &nbsp;·&nbsp; — לא נבחר</div></div>';
+   '<div class="note"><div class="lg"><span class="mark ok">✓</span>הבחירה שלכם זהה למאפיין</div>'+
+   '<div class="lg"><span class="mark no">✗</span>בחרתם אפשרות אחרת באותו ציר</div>'+
+   '<div class="lg"><span class="mark na">—</span>לא נבחר</div></div></div>';
   PROFS.forEach(p=>{
     let yes=0, tot=0, rows='';
     Object.keys(p.ax).forEach(k=>{
